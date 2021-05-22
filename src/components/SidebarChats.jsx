@@ -1,34 +1,53 @@
-import { Avatar } from '@material-ui/core'
-import React, { useEffect, useState } from 'react'
-import './css/SidebarChats.css'
+import { Avatar } from "@material-ui/core";
+import React, { useEffect, useState } from "react";
+import { Link } from "react-router-dom";
+import db from "../services/firebase";
+import "./css/SidebarChats.css";
 
-function SidebarChats({addNewChat}) {
-    const [seed, setSeed] = useState(0)
-
-    useEffect(() => {
-        setSeed(Math.floor(Math.random()*5000))
-    }, [] );
-
-    const createChat = () => {
-        const roomName = prompt("Plaease Enter name for chat");
-
-        if (roomName) {
-            // db stuff
-        }
+function SidebarChats({ id, name, addNewChat }) {
+  const [seed, setSeed] = useState(0);
+  const [messages, setMessages] = useState("");
+  useEffect(() => {
+    if (id) {
+      db.collection("rooms")
+        .doc(id)
+        .collection("messages")
+        .orderBy("timestamp", "desc")
+        .onSnapshot((snapshot) =>
+          setMessages(snapshot.docs.map((doc) => doc.data()))
+        );
     }
+  }, [id]);
 
-    return !addNewChat ? (
-        <div className="sidebarChat">
-            <Avatar src={`https://avatars.dicebear.com/api/human/${seed}.svg`} />
-            <div className="sidebarChat__info">
-                <h2>Room Name</h2>
-                <p>Last message...</p>
-            </div>
+  useEffect(() => {
+    setSeed(Math.floor(Math.random() * 5000));
+  }, []);
+
+  const createChat = () => {
+    const roomName = prompt("Plaease Enter name for chat");
+
+    if (roomName) {
+      // db stuff
+      db.collection("rooms").add({
+        name: roomName,
+      });
+    }
+  };
+
+  return !addNewChat ? (
+    <Link to={`/rooms/${id}`}>
+      <div className="sidebarChat">
+        <Avatar src={`https://avatars.dicebear.com/api/human/${seed}.svg`} />
+        <div className="sidebarChat__info">
+          <h2> {name} </h2>
+          <p> { messages[0]?.message } </p>
         </div>
-    ) : (
-        <div onClick={createChat} className='sidebarChat'>
-            <h2>Add New Chat</h2>
-        </div>
-    )
+      </div>
+    </Link>
+  ) : (
+    <div onClick={createChat} className="sidebarChat">
+      <h2>Add New Chat</h2>
+    </div>
+  );
 }
-export default SidebarChats
+export default SidebarChats;
