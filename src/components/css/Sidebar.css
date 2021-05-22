@@ -1,5 +1,7 @@
 .sidebar{
     flex: 0.35;
+    display: flex;
+    flex-direction: column;
 }
 
 .sidebar__header{
@@ -13,7 +15,7 @@
 .sidebar__header__icons{
     display: flex;
     min-width:  10vw;
-    justify-content: space-around;
+    justify-content: space-between;
     align-items: center;
 }
 
@@ -46,5 +48,14 @@
 .sidebar__search__searchcontainer > input:focus{
     outline: none;
     font-size: 1.2rem;
+}
+
+.sidebar__chats{
+    flex: 1;
+    background-color: white;
+    overflow: scroll;
+}
+.sidebar__chats::-webkit-scrollbar {
+    display: none;
 }
 
