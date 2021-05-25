@@ -6,6 +6,7 @@ import "./css/Sidebar.css";
 import { DonutLarge, MoreVert, Search } from "@material-ui/icons";
 import { IconButton, Avatar } from "@material-ui/core";
 import { useStateValue } from "../helpers/StateProvider";
+import { actionTypes } from "../helpers/reducer";
 
 export default function Sidebar() {
   const [rooms, setRooms] = useState([]);
@@ -25,6 +26,22 @@ export default function Sidebar() {
     }
   }, []);
 
+  const createChat = () => {
+    const roomName = prompt("Plaease Enter name for chat");
+
+    if (roomName) {
+      // db stuff
+      db.collection("rooms").add({
+        name: roomName,
+      });
+    }
+  };
+
+  const logout = () => {
+    localStorage.removeItem("currentUser");
+    dispatch({ type: actionTypes.REMOVE_USER });
+  };
+
   return (
     <div className="sidebar">
       <div className="sidebar__header">
@@ -33,11 +50,19 @@ export default function Sidebar() {
           <IconButton>
             <DonutLarge />
           </IconButton>
-          <IconButton>
+          <IconButton className="chatIcon">
             <ChatIcon />
+            <div className={'create_chat', 'show'} onClick={createChat}>
+              {" "}
+              Create Room
+            </div>
           </IconButton>
-          <IconButton>
+          <IconButton className="logout_icon">
             <MoreVert />
+            <div className={'logout', 'show'} onClick={logout}>
+              {" "}
+              Log Out 
+            </div>
           </IconButton>
         </div>
       </div>
@@ -53,7 +78,6 @@ export default function Sidebar() {
         </div>
       </div>
       <div className="sidebar__chats">
-        <SidebarChats addNewChat />
         {rooms.map((room) => (
           <SidebarChats key={room.id} id={room.id} name={room.data.name} />
         ))}

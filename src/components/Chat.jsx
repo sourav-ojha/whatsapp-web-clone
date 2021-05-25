@@ -6,7 +6,7 @@ import {
   MoreVert,
   Search,
 } from "@material-ui/icons";
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useRef } from "react";
 import { useParams } from "react-router-dom";
 import db from "../services/firebase";
 import "./css/Chat.css";
@@ -21,6 +21,16 @@ function Chat() {
 
   const [{ user }, dispatch] = useStateValue();
   const [messages, setMessages] = useState([]);
+
+  const messagesEndRef = useRef(null);
+
+  const scrollToBottom = () => {
+    messagesEndRef.current.scrollIntoView({ behavior: 'smooth' })
+  }
+  useEffect(() => {
+    scrollToBottom()
+  }, [messages]);
+
 
   useEffect(() => {
     setSeed(Math.floor(Math.random() * 5000));
@@ -41,14 +51,14 @@ function Chat() {
 
   const sendMessage = (e) => {
     e.preventDefault();
+    if (input !== "") {
+      db.collection("rooms").doc(roomId).collection("messages").add({
+        message: input,
+        name: user.displayName,
+        timestamp: firebase.firestore.FieldValue.serverTimestamp(),
+      });
+    }
     setInput("");
-    console.log("input", input);
-
-    db.collection("rooms").doc(roomId).collection("messages").add({
-      message: input,
-      name: user.displayName,
-      timestamp: firebase.firestore.FieldValue.serverTimestamp(),
-    });
   };
 
   return (
@@ -57,11 +67,12 @@ function Chat() {
         <Avatar src={`https://avatars.dicebear.com/api/human/${seed}.svg`} />
         <div className="chat__header__info">
           <h3> {roomName} </h3>
-          <p>Last Seen at {" "} 
-            {new Date(messages[messages.length - 1]?.timestamp?.toDate()).toUTCString()} 
-            
-                    
-            </p>
+          <p>
+            Last Seen at{" "}
+            {new Date(
+              messages[messages.length - 1]?.timestamp?.toDate()
+            ).toUTCString()}
+          </p>
         </div>
         <div className="chat__header__right">
           <IconButton>
@@ -90,6 +101,7 @@ function Chat() {
             </span>
           </p>
         ))}
+        <div ref={messagesEndRef} />
       </div>
 
       <div className="chat__footer">

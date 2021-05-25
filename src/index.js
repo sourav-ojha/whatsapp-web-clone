@@ -2,8 +2,8 @@ import React from "react";
 import ReactDOM from "react-dom";
 import "./index.css";
 import App from "./App";
-import { StateProvider } from './helpers/StateProvider';
-import reducer, { initialState } from './helpers/reducer'
+import { StateProvider } from "./helpers/StateProvider";
+import {reducer, initialState } from "./helpers/reducer";
 
 import reportWebVitals from "./reportWebVitals";
 
